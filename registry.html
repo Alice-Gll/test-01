@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册页面</title>
+</head>
+
+<body>
+    <fieldset style="width:800px;margin:0 auto;">
+        <legend>用户注册111</legend>
+        <form action="http://localhost/vscodetwo/week-05/JD/set/php/reg.php" method="POST">
+            <!-- 准备接受注册信息的后端页面 -->
+            <p><label for="">用户姓名：</label><input type="text" name="username" class="username"><span></span></p>
+            <p><label for="">用户密码：</label><input type="password" name="password"></p>
+            <p><label for="">确认密码：</label><input type="password" name="repass"></p>
+            <p><label for="">用户邮箱：</label><input type="text" name="email"></p>
+            <p><input type="submit" value="用户注册" name="submit"></p>
+        </form>
+    </fieldset>
+</body>
+
+</html>
+<!-- 
+    注册的思路：
+    将注册的所有的信息提交到数据库 - 涉及的表单验证。
+        - 用户点击submit按钮直接提交(form+submit+name+action)
+        - 用户名重名检测：如果用户名存在不允许注册。
+        - 如果注册成功跳转到登录页面。
+ -->
+<script src="js/ajax_promise.js"></script>
+<script>
+    // 1.用户点击submit按钮直接提交(form+submit+name+action) - 直接完成
+
+    // 2.用户名重名检测：如果用户名存在不允许注册。
+    // 失去焦点事件进行检测
+    // 检测过程：
+    // 先通过ajax将用户名传给后端，后端拿到前端的值和数据库里面的值进行匹配，如果数据库里面存在，说明此用户名不能使用。否则可以使用。
+    // 后端将匹配的结果返回前端，前端提示错误。
+    const username = document.querySelector('.username');
+    const span = document.querySelector('span');
+    const form = document.querySelector('form');
+    let flag = true;
+    username.onblur = function() {
+        $ajax({
+            type: 'post',
+            url: 'http://localhost/vscodetwo/week-05/JD/set/php/reg.php',
+            data: {
+                checkname: username.value
+            }
+        }).then(function(data) {
+            if (data === 'true') { //存在
+                span.innerHTML = '该用户名已存在';
+                span.style.color = 'red';
+                flag = false;
+            } else if (data === 'false') {
+                span.innerHTML = '√';
+                span.style.color = 'green';
+                flag = true;
+            }
+        })
+    };
+
+    //阻止浏览器的submit跳转，如果用户名不能通过，不允许提交注册。
+    form.onsubmit = function() {
+        if (!flag) {
+            return false;
+        }
+    }
+
+    //如果注册成功跳转到登录页面 - 后端做的
+</script>
